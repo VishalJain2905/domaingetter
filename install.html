@@ -396,6 +396,18 @@
 
   <script>
     (function () {
+      if (window.location.search.indexOf('unlocked=1') >= 0) {
+        try {
+          var raw = localStorage.getItem('bds');
+          var state = raw ? JSON.parse(raw) : {};
+          state.rewardUnlocked = true;
+          localStorage.setItem('bds', JSON.stringify(state));
+          if (window.history && window.history.replaceState) {
+            window.history.replaceState({}, '', window.location.pathname || '/');
+          }
+        } catch (e) {}
+      }
+
       const dragBtn = document.getElementById('dragBtn');
       const statusPill = document.getElementById('statusPill');
       const statusText = document.getElementById('statusText');
