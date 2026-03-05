@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Install Bookmarklet</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 520px; margin: 2rem auto; padding: 0 1rem; }
+    h1 { font-size: 1.25rem; }
+    p { color: #444; line-height: 1.5; }
+    .link-box { margin: 1.5rem 0; padding: 1rem; background: #f0f0f0; border-radius: 8px; }
+    .link-box a { font-size: 14px; color: #4361ee; text-decoration: none; }
+    .link-box a:hover { text-decoration: underline; }
+    .step { margin: 0.75rem 0; padding-left: 1rem; border-left: 3px solid #4361ee; }
+    .error { color: #c00; }
+  </style>
+</head>
+<body>
+  <h1>Install domain bookmarklet</h1>
+  <p>Use the link below. Do <strong>not</strong> copy from another project—this page loads the correct code from this repo.</p>
+
+  <div class="link-box" id="box">
+    <p id="status">Loading bookmarklet…</p>
+    <p id="link-wrap" style="display:none;"><strong>Drag this to your bookmarks bar:</strong><br><a href="#" id="bookmarklet-link">Domain Bookmarklet</a></p>
+    <p id="err" class="error" style="display:none;"></p>
+  </div>
+
+  <div class="step"><strong>Chrome/Edge:</strong> Drag the link above onto your bookmarks bar. Or right‑click it → “Add to bookmarks”.</div>
+  <div class="step"><strong>Firefox:</strong> Right‑click the link → “Bookmark Link…”.</div>
+  <div class="step">Then open YouTube, Google, etc., and click the bookmark. You should see a popup and a progress widget.</div>
+
+  <p style="margin-top:2rem;"><strong>If you get “Unexpected identifier $” on YouTube/Google:</strong> Chrome truncates long bookmark URLs. Use the loader instead (it fetches the script from this server):</p>
+  <div class="link-box">
+    <p id="loader-status">Loading loader…</p>
+    <p id="loader-wrap" style="display:none;"><strong>Drag this to your bookmarks bar:</strong><br><a href="#" id="loader-link">Domain Bookmarklet (loader)</a></p>
+  </div>
+
+  <script>
+    (function () {
+      var status = document.getElementById('status');
+      var linkWrap = document.getElementById('link-wrap');
+      var errEl = document.getElementById('err');
+      var a = document.getElementById('bookmarklet-link');
+
+      fetch('build/bookmarklet.js')
+        .then(function (r) { return r.text(); })
+        .then(function (code) {
+          code = code.trim();
+          if (!code.startsWith('javascript:')) {
+            errEl.textContent = 'Unexpected format in build/bookmarklet.js';
+            errEl.style.display = 'block';
+            return;
+          }
+          a.href = code;
+          status.textContent = 'Ready. Drag the link below to your bookmarks bar:';
+          linkWrap.style.display = 'block';
+        })
+        .catch(function (e) {
+          status.style.display = 'none';
+          errEl.textContent = 'Could not load build/bookmarklet.js. Run "npm run build" and serve this folder (e.g. npm run test), then open this page again.';
+          errEl.style.display = 'block';
+        });
+
+      var loaderStatus = document.getElementById('loader-status');
+      var loaderWrap = document.getElementById('loader-wrap');
+      var loaderLink = document.getElementById('loader-link');
+      fetch('build/bookmarklet-loader.js')
+        .then(function (r) { return r.text(); })
+        .then(function (code) {
+          var base = location.origin;
+          code = code.trim().replace('__BASE_URL__', base);
+          loaderLink.href = code;
+          loaderStatus.textContent = 'Loader ready.';
+          loaderWrap.style.display = 'block';
+        })
+        .catch(function () { loaderStatus.textContent = 'Loader not available.'; });
+    })();
+  </script>
+</body>
+</html>

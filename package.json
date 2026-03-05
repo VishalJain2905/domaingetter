@@ -1,0 +1,16 @@
+{
+  "name": "domain-bookmarklet",
+  "version": "1.0.0",
+  "description": "Domain-aware bookmarklet system with state tracking and progress UI",
+  "type": "module",
+  "scripts": {
+    "build": "node build.js",
+    "prebuild": "mkdir -p build",
+    "test": "npm run build && node server.js",
+    "build:static": "npm run build && node scripts/prepare-static.js"
+  },
+  "devDependencies": {
+    "esbuild": "^0.24.0",
+    "terser": "^5.36.0"
+  }
+}
