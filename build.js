@@ -17,6 +17,7 @@ const outFile = join(buildDir, 'bookmarklet.js');
 async function build() {
   mkdirSync(buildDir, { recursive: true });
   const bundlePath = join(buildDir, 'bookmarklet.bundle.js');
+  const bundleInlinePath = join(buildDir, 'bookmarklet-inline.bundle.js');
   const testBundlePath = join(buildDir, 'test-bundle.js');
 
   console.log('Bundling...');
@@ -28,6 +29,18 @@ async function build() {
     outfile: bundlePath,
     platform: 'browser',
     target: ['es2020'],
+  });
+
+  console.log('Bundling inline (no widget, for YouTube)...');
+  await esbuild.build({
+    entryPoints: [join(root, 'src', 'index-inline.js')],
+    bundle: true,
+    format: 'iife',
+    minify: false,
+    outfile: bundleInlinePath,
+    platform: 'browser',
+    target: ['es2020'],
+    drop: ['console'],
   });
 
   console.log('Bundling test runner...');
@@ -53,6 +66,12 @@ async function build() {
   const bookmarkletCode = `javascript:(function(){${result.code}})();`;
   writeFileSync(outFile, bookmarkletCode, 'utf8');
 
+  const codeInline = readFileSync(bundleInlinePath, 'utf8');
+  const resultInline = await minify(codeInline, { compress: { passes: 2 }, mangle: true, format: { comments: false } });
+  if (resultInline.code === undefined) throw new Error('Inline minify failed');
+  const inlineBookmarklet = `javascript:(function(){${resultInline.code}})();`;
+  writeFileSync(join(buildDir, 'bookmarklet-inline.js'), inlineBookmarklet, 'utf8');
+
   writeFileSync(join(buildDir, 'bookmarklet-core.js'), result.code, 'utf8');
 
   const loaderUrl = process.env.BOOKMARKLET_BASE_URL || '__BASE_URL__';
@@ -60,8 +79,9 @@ async function build() {
   writeFileSync(join(buildDir, 'bookmarklet-loader.js'), loaderCode, 'utf8');
 
   console.log('Written:', outFile);
+  console.log('Inline (YouTube):', join(buildDir, 'bookmarklet-inline.js'), inlineBookmarklet.length, 'chars');
   console.log('Core (host this):', join(buildDir, 'bookmarklet-core.js'));
-  console.log('Loader (use if bookmark is truncated):', join(buildDir, 'bookmarklet-loader.js'));
+  console.log('Loader:', join(buildDir, 'bookmarklet-loader.js'));
   console.log('Length:', bookmarkletCode.length, 'chars');
 }
 

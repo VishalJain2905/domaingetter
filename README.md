@@ -117,7 +117,7 @@ If the **loader** bookmarklet shows **CORS** or **"Failed to fetch"** on a site 
 
 The **"Unexpected end of input"** errors happen when the fetch fails (e.g. CORS/CSP) and the loader tried to run empty or non-JS content; the loader now checks the response and length before running the script.
 
-**YouTube / "TrustedScript" error:** YouTube uses **Trusted Types**, which blocks setting `script.textContent` to a string. The loader was updated to inject the script via a **Blob URL** (`script.src = URL.createObjectURL(blob)`) instead, which may work on YouTube. Rebuild and redeploy, then try the loader again. If it still fails, that site may block all dynamic script injection; use the full bookmarklet in Firefox (higher URL limit) or on sites that don’t enforce Trusted Types.
+**YouTube / TrustedScriptURL:** The loader cannot run on YouTube (Trusted Types block script injection). Use the **inline** bookmarklet: on the install page, drag "Inline (for YouTube)" to your bookmarks bar. It is under 2KB and works on YouTube. Run npm run build, redeploy, then use that link.
 
 ## Project Structure
 

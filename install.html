@@ -35,6 +35,12 @@
     <p id="loader-wrap" style="display:none;"><strong>Drag this to your bookmarks bar:</strong><br><a href="#" id="loader-link">Domain Bookmarklet (loader)</a></p>
   </div>
 
+  <p style="margin-top:2rem;"><strong>YouTube / TrustedScriptURL:</strong> Use the inline bookmarklet (no widget, works on YouTube):</p>
+  <div class="link-box">
+    <p id="inline-status">Loading...</p>
+    <p id="inline-wrap" style="display:none;"><strong>Drag to bookmarks:</strong> <a href="#" id="inline-link">Inline (for YouTube)</a></p>
+  </div>
+
   <script>
     (function () {
       var status = document.getElementById('status');
@@ -74,6 +80,15 @@
           loaderWrap.style.display = 'block';
         })
         .catch(function () { loaderStatus.textContent = 'Loader not available.'; });
+
+      var inlineStatus = document.getElementById('inline-status');
+      var inlineWrap = document.getElementById('inline-wrap');
+      var inlineLink = document.getElementById('inline-link');
+      fetch('build/bookmarklet-inline.js').then(function(r){return r.text();}).then(function(code){
+        code=code.trim();
+        if(code.startsWith('javascript:')){ inlineLink.href=code; inlineStatus.textContent='Ready (use on YouTube).'; inlineWrap.style.display='block'; }
+        else { inlineStatus.textContent='Run npm run build.'; }
+      }).catch(function(){ inlineStatus.textContent='Not available.'; });
     })();
   </script>
 </body>
