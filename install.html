@@ -3,94 +3,418 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Install Bookmarklet</title>
+  <title>Domain Bookmarklet - Install</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
   <style>
-    body { font-family: system-ui, sans-serif; max-width: 520px; margin: 2rem auto; padding: 0 1rem; }
-    h1 { font-size: 1.25rem; }
-    h2 { font-size: 0.95rem; }
-    p { color: #444; line-height: 1.5; }
-    .link-box { margin: 1rem 0; padding: 1rem; background: #f0f0f0; border-radius: 8px; }
-    .link-box a { font-size: 14px; color: #4361ee; text-decoration: none; font-weight: 600; }
-    .link-box a:hover { text-decoration: underline; }
-    .step { margin: 0.75rem 0; padding-left: 1rem; border-left: 3px solid #4361ee; }
-    hr { margin: 2rem 0; border: none; border-top: 1px solid #ddd; }
-    .advanced { font-size: 0.85rem; color: #666; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 500px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      overflow: hidden;
+      animation: slideUp 0.6s ease-out;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: 40px 30px;
+      color: white;
+      text-align: center;
+    }
+
+    .header h1 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 10px;
+      letter-spacing: -0.5px;
+    }
+
+    .header p {
+      font-size: 14px;
+      opacity: 0.95;
+      line-height: 1.6;
+    }
+
+    .content {
+      padding: 40px 30px;
+    }
+
+    .drag-zone {
+      position: relative;
+      border: 3px dashed #667eea;
+      border-radius: 12px;
+      padding: 40px 30px;
+      text-align: center;
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+      cursor: grab;
+      transition: all 0.3s ease;
+      margin-bottom: 30px;
+    }
+
+    .drag-zone:hover {
+      border-color: #764ba2;
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+      transform: translateY(-2px);
+    }
+
+    .drag-zone.dragging {
+      border-color: #667eea;
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
+      transform: scale(1.02);
+    }
+
+    .drag-icon {
+      font-size: 48px;
+      margin-bottom: 15px;
+      display: block;
+    }
+
+    .drag-text {
+      font-weight: 600;
+      color: #667eea;
+      font-size: 18px;
+      margin-bottom: 8px;
+    }
+
+    .drag-subtext {
+      font-size: 13px;
+      color: #666;
+      line-height: 1.5;
+    }
+
+    .instructions {
+      background: #f8f9fa;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 25px;
+    }
+
+    .instructions h3 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      color: #333;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 12px;
+    }
+
+    .instruction-step {
+      display: flex;
+      align-items: flex-start;
+      margin-bottom: 10px;
+      font-size: 13px;
+      color: #555;
+      line-height: 1.5;
+    }
+
+    .instruction-step:last-child {
+      margin-bottom: 0;
+    }
+
+    .step-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #667eea;
+      color: white;
+      font-weight: 600;
+      font-size: 12px;
+      margin-right: 10px;
+      flex-shrink: 0;
+    }
+
+    .status {
+      text-align: center;
+      padding: 15px;
+      border-radius: 8px;
+      font-size: 13px;
+      margin-bottom: 20px;
+      font-weight: 500;
+    }
+
+    .status.loading {
+      background: #e3f2fd;
+      color: #1976d2;
+    }
+
+    .status.ready {
+      background: #e8f5e9;
+      color: #2e7d32;
+    }
+
+    .footer {
+      border-top: 1px solid #eee;
+      padding: 25px 30px;
+      text-align: center;
+    }
+
+    .footer p {
+      font-size: 12px;
+      color: #999;
+      margin-bottom: 10px;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .footer-link {
+      font-size: 12px;
+      color: #667eea;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .footer-link:hover {
+      color: #764ba2;
+      text-decoration: underline;
+    }
+
+    .badge {
+      display: inline-block;
+      background: #667eea;
+      color: white;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      margin-top: 15px;
+    }
+
+    .divider {
+      height: 1px;
+      background: #eee;
+      margin: 25px 0;
+    }
+
+    .advanced-section {
+      margin-top: 30px;
+      padding-top: 25px;
+      border-top: 1px solid #eee;
+    }
+
+    .advanced-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 15px;
+    }
+
+    .advanced-item {
+      background: #f8f9fa;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 12px;
+      font-size: 12px;
+    }
+
+    .advanced-item p {
+      color: #666;
+      margin-bottom: 8px;
+      line-height: 1.5;
+    }
+
+    .advanced-link {
+      display: inline-block;
+      color: #667eea;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 13px;
+      transition: color 0.2s;
+    }
+
+    .advanced-link:hover {
+      color: #764ba2;
+    }
+
+    @media (max-width: 480px) {
+      .header h1 {
+        font-size: 24px;
+      }
+
+      .content {
+        padding: 30px 20px;
+      }
+
+      .drag-zone {
+        padding: 30px 20px;
+      }
+
+      .drag-icon {
+        font-size: 40px;
+      }
+    }
   </style>
 </head>
 <body>
-  <h1>Install Domain Bookmarklet</h1>
-  <p><strong style="color: #2c3e50;">✅ Use the UNIVERSAL bookmarklet below on all sites.</strong> It automatically detects the domain and runs the right action.</p>
+  <div class="container">
+    <div class="card">
+      <!-- Header -->
+      <div class="header">
+        <h1>Domain Bookmarklet</h1>
+        <p>One bookmarklet for all sites. Automatically detects domain & tracks progress.</p>
+      </div>
 
-  <div class="link-box">
-    <p id="universal-status">Loading universal...</p>
-    <p id="universal-wrap" style="display:none;">
-      <strong>Drag to your bookmarks bar:</strong><br>
-      <a href="#" id="universal-link">Domain Bookmarklet (Universal - use this)</a>
-    </p>
-  </div>
+      <!-- Content -->
+      <div class="content">
+        <!-- Status -->
+        <div class="status loading" id="status">
+          Loading bookmarklet...
+        </div>
 
-  <div class="step"><strong>Chrome/Edge:</strong> Drag the link above to your bookmarks bar.</div>
-  <div class="step"><strong>Firefox:</strong> Right‑click the link → "Bookmark Link…".</div>
-  <div class="step">Then click the bookmark on YouTube, Netflix, Google, Twitter, etc. You should see a popup.</div>
+        <!-- Main Drag Zone -->
+        <div class="drag-zone" id="dragZone" draggable="false">
+          <span class="drag-icon">📌</span>
+          <div class="drag-text" id="dragText">Domain Bookmarklet</div>
+          <div class="drag-subtext">Drag to bookmarks bar</div>
+          <span class="badge">All Sites</span>
+        </div>
 
-  <hr>
+        <!-- Instructions -->
+        <div class="instructions">
+          <h3>How to install</h3>
+          <div class="instruction-step">
+            <span class="step-icon">1</span>
+            <span><strong>Chrome/Edge:</strong> Drag the button to your bookmarks bar</span>
+          </div>
+          <div class="instruction-step">
+            <span class="step-icon">2</span>
+            <span><strong>Firefox:</strong> Right-click → "Bookmark Link"</span>
+          </div>
+          <div class="instruction-step">
+            <span class="step-icon">3</span>
+            <span>Click it on <strong>YouTube, Netflix, Google, Twitter</strong>, etc.</span>
+          </div>
+          <div class="instruction-step">
+            <span class="step-icon">✓</span>
+            <span>See a popup showing domain name & count</span>
+          </div>
+        </div>
 
-  <h2>Advanced (if needed):</h2>
-  
-  <p class="advanced"><strong>If you get errors on YouTube:</strong> Use the inline version instead:</p>
-  <div class="link-box">
-    <p id="inline-status">Loading...</p>
-    <p id="inline-wrap" style="display:none;"><strong>Drag:</strong> <a href="#" id="inline-link">Inline (YouTube)</a></p>
-  </div>
+        <!-- Advanced -->
+        <div class="advanced-section">
+          <div class="advanced-title">Advanced Options</div>
+          
+          <div class="advanced-item">
+            <p><strong>For YouTube (if errors):</strong></p>
+            <p id="inline-status">Loading...</p>
+            <p id="inline-wrap" style="display:none;">
+              <a href="#" id="inlineLink" class="advanced-link">Use Inline Version →</a>
+            </p>
+          </div>
 
-  <p class="advanced"><strong>If bookmark URL is truncated in Chrome:</strong> Use the loader:</p>
-  <div class="link-box">
-    <p id="loader-status">Loading...</p>
-    <p id="loader-wrap" style="display:none;"><strong>Drag:</strong> <a href="#" id="loader-link">Loader (fallback)</a></p>
+          <div class="advanced-item">
+            <p><strong>If Chrome truncates URL:</strong></p>
+            <p id="loaderStatus">Loading...</p>
+            <p id="loaderWrap" style="display:none;">
+              <a href="#" id="loaderLink" class="advanced-link">Use Loader →</a>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="footer">
+        <p>Works on all websites • Tracks progress locally • No server needed</p>
+        <div class="footer-links">
+          <a href="README.md" class="footer-link">Docs</a>
+          <a href="test/" class="footer-link">Test Demo</a>
+          <a href="https://github.com" class="footer-link">GitHub</a>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script>
     (function () {
-      var universalStatus = document.getElementById('universal-status');
-      var universalWrap = document.getElementById('universal-wrap');
-      var universalLink = document.getElementById('universal-link');
+      const dragZone = document.getElementById('dragZone');
+      const dragText = document.getElementById('dragText');
+      const status = document.getElementById('status');
 
+      // Load universal bookmarklet
       fetch('build/bookmarklet-universal.js')
-        .then(function (r) { return r.text(); })
-        .then(function (code) {
+        .then(r => r.text())
+        .then(code => {
           code = code.trim();
           if (code.startsWith('javascript:')) {
-            universalLink.href = code;
-            universalStatus.textContent = 'Ready. Use this everywhere:';
-            universalWrap.style.display = 'block';
-          } else {
-            universalStatus.textContent = 'Run: npm run build';
+            dragZone.href = code;
+            dragZone.style.cursor = 'grab';
+            dragZone.draggable = true;
+            dragZone.addEventListener('dragstart', e => {
+              e.dataTransfer.setData('text/plain', code);
+              dragZone.classList.add('dragging');
+            });
+            dragZone.addEventListener('dragend', () => dragZone.classList.remove('dragging'));
+            status.textContent = '✓ Ready to install';
+            status.className = 'status ready';
           }
         })
-        .catch(function () { universalStatus.textContent = 'Not available'; });
+        .catch(() => {
+          status.textContent = 'Run: npm run build:static';
+          status.className = 'status loading';
+        });
 
-      var inlineStatus = document.getElementById('inline-status');
-      var inlineWrap = document.getElementById('inline-wrap');
-      var inlineLink = document.getElementById('inline-link');
-      fetch('build/bookmarklet-inline.js').then(function(r){return r.text();}).then(function(code){
-        code=code.trim();
-        if(code.startsWith('javascript:')){ inlineLink.href=code; inlineStatus.textContent='Ready (YouTube).'; inlineWrap.style.display='block'; }
-        else { inlineStatus.textContent='Not available.'; }
-      }).catch(function(){ inlineStatus.textContent='Not available.'; });
-
-      var loaderStatus = document.getElementById('loader-status');
-      var loaderWrap = document.getElementById('loader-wrap');
-      var loaderLink = document.getElementById('loader-link');
-      fetch('build/bookmarklet-loader.js')
-        .then(function (r) { return r.text(); })
-        .then(function (code) {
-          var base = location.origin;
-          code = code.trim().replace('__BASE_URL__', base);
-          loaderLink.href = code;
-          loaderStatus.textContent = 'Ready (fallback).';
-          loaderWrap.style.display = 'block';
+      // Load inline
+      fetch('build/bookmarklet-inline.js')
+        .then(r => r.text())
+        .then(code => {
+          if (code.trim().startsWith('javascript:')) {
+            document.getElementById('inlineLink').href = code.trim();
+            document.getElementById('inlineWrap').style.display = 'block';
+          }
         })
-        .catch(function () { loaderStatus.textContent = 'Not available.'; });
+        .catch(() => {});
+
+      // Load loader
+      fetch('build/bookmarklet-loader.js')
+        .then(r => r.text())
+        .then(code => {
+          const base = location.origin;
+          code = code.trim().replace('__BASE_URL__', base);
+          document.getElementById('loaderLink').href = code;
+          document.getElementById('loaderWrap').style.display = 'block';
+        })
+        .catch(() => {});
     })();
   </script>
 </body>
