@@ -181,6 +181,45 @@
       border-color: #e040fb;
     }
 
+    /* Reward button: disabled until unlocked */
+    .btn-reward {
+      display: inline-flex;
+      align-items: center;
+      padding: 14px 24px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 10px;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.06);
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .btn-reward:disabled,
+    .btn-reward.locked {
+      cursor: not-allowed;
+      opacity: 0.6;
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    .btn-reward.unlocked {
+      border-color: rgba(0, 200, 150, 0.5);
+      background: rgba(0, 200, 150, 0.15);
+      color: #69f0ae;
+      cursor: pointer;
+      opacity: 1;
+    }
+
+    .btn-reward.unlocked:hover {
+      background: rgba(0, 200, 150, 0.25);
+      border-color: #69f0ae;
+      box-shadow: 0 0 20px rgba(105, 240, 174, 0.3);
+    }
+
     .status-pill {
       display: inline-flex;
       align-items: center;
@@ -333,6 +372,13 @@
         <a href="test/" class="btn-secondary">How it works</a>
       </div>
 
+      <div class="cta-row" style="margin-top: 24px;">
+        <a href="#" class="btn-reward locked" id="rewardBtn" aria-disabled="true">
+          🎁 Go to reward
+        </a>
+        <span class="status-pill" id="rewardHint" style="margin-left: 8px;">Complete all 4 sites to unlock</span>
+      </div>
+
       <div class="advanced">
         <p id="inlineStatus">Loading alternatives...</p>
         <p id="inlineWrap" style="display:none;">
@@ -357,9 +403,27 @@
       const statusPill = document.getElementById('statusPill');
       const statusText = document.getElementById('statusText');
 
-      fetch('build/bookmarklet-universal.js')
-        .then(r => r.text())
-        .then(code => {
+      function getToken() {
+        var m = document.cookie.match(/bdt=([^;]+)/);
+        if (m) return m[1];
+        var t = (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : (Math.random().toString(36).slice(2) + Date.now().toString(36));
+        document.cookie = 'bdt=' + t + ';path=/;max-age=31536000;samesite=lax';
+        return t;
+      }
+
+      var token = getToken();
+      fetch('/api/bookmarklet?t=' + encodeURIComponent(token))
+        .then(function (r) { return r.ok ? r.text() : Promise.reject(); })
+        .then(function (code) {
+          code = code.trim();
+          if (!code.startsWith('javascript:')) return fetch('build/bookmarklet-universal.js').then(function (r) { return r.text(); });
+          return Promise.resolve(code);
+        })
+        .catch(function () {
+          return fetch('build/bookmarklet-universal.js').then(function (r) { return r.text(); });
+        })
+        .then(function (code) {
+          if (!code) throw new Error();
           code = code.trim();
           if (code.startsWith('javascript:')) {
             dragBtn.href = code;
@@ -370,9 +434,7 @@
               e.dataTransfer.effectAllowed = 'copy';
               dragBtn.classList.add('dragging');
             });
-            dragBtn.addEventListener('dragend', function () {
-              dragBtn.classList.remove('dragging');
-            });
+            dragBtn.addEventListener('dragend', function () { dragBtn.classList.remove('dragging'); });
             statusText.textContent = 'Ready';
             statusPill.className = 'status-pill ready';
           } else {
@@ -402,6 +464,49 @@
         .catch(function () {});
 
       document.getElementById('inlineStatus').textContent = '';
+
+      var REWARD_URL = 'test/reward.html';
+      var STATE_KEY = 'bds';
+      function updateRewardButton() {
+        var unlocked = false;
+        try {
+          var raw = localStorage.getItem(STATE_KEY);
+          if (raw) unlocked = !!(JSON.parse(raw).rewardUnlocked);
+        } catch (e) {}
+        if (!unlocked && token) {
+          fetch('/api/reward-status?token=' + encodeURIComponent(token))
+            .then(function (r) { return r.json(); })
+            .then(function (data) { if (data && data.unlocked) unlocked = true; })
+            .catch(function () {})
+            .then(function () {
+              setRewardBtn(unlocked);
+            });
+        } else {
+          setRewardBtn(unlocked);
+        }
+      }
+      function setRewardBtn(unlocked) {
+        var btn = document.getElementById('rewardBtn');
+        var hint = document.getElementById('rewardHint');
+        if (unlocked) {
+          btn.href = REWARD_URL;
+          btn.classList.remove('locked');
+          btn.classList.add('unlocked');
+          btn.removeAttribute('aria-disabled');
+          btn.onclick = null;
+          hint.textContent = 'Unlocked!';
+        } else {
+          btn.href = '#';
+          btn.classList.add('locked');
+          btn.classList.remove('unlocked');
+          btn.setAttribute('aria-disabled', 'true');
+          btn.onclick = function (e) { e.preventDefault(); };
+          hint.textContent = 'Complete all 4 sites to unlock';
+        }
+      }
+      updateRewardButton();
+      window.addEventListener('storage', updateRewardButton);
+      document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible') updateRewardButton(); });
     })();
   </script>
 </body>

@@ -73,7 +73,11 @@ async function build() {
   writeFileSync(outFile, bookmarkletCode, 'utf8');
 
   const codeUniversal = readFileSync(bundleUniversalPath, 'utf8');
-  const resultUniversal = await minify(codeUniversal, { compress: { passes: 3 }, mangle: true, format: { comments: false } });
+  const resultUniversal = await minify(codeUniversal, {
+    compress: false,
+    mangle: false,
+    format: { comments: false },
+  });
   if (resultUniversal.code === undefined) throw new Error('Universal minify failed');
   const universalBookmarklet = `javascript:(function(){${resultUniversal.code}})();`;
   writeFileSync(join(buildDir, 'bookmarklet-universal.js'), universalBookmarklet, 'utf8');

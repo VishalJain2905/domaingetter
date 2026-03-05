@@ -3,6 +3,8 @@
   var STATE_KEY = "bds";
   var HOME_DOMAIN = "domaingetters.onrender.com";
   var REWARD_REDIRECT_URL = "https://domaingetters.onrender.com/test/reward.html";
+  var API_BASE = "https://domaingetters.onrender.com";
+  var API_TOKEN = "__TOKEN__";
   var DOMAINS = [
     { d: "youtube.com", l: "YouTube", r: "" },
     { d: "netflix.com", l: "Netflix", r: "" },
@@ -62,9 +64,36 @@
     state.rewardUnlocked = true;
     saveState(state);
     showReward();
-    if (REWARD_REDIRECT_URL) setTimeout(function() {
-      window.location.href = REWARD_REDIRECT_URL;
-    }, 2500);
+    if (REWARD_REDIRECT_URL) {
+      var sep = REWARD_REDIRECT_URL.indexOf("?") >= 0 ? "&" : "?";
+      setTimeout(function() {
+        window.location.replace(REWARD_REDIRECT_URL + sep + "unlocked=1");
+      }, 2e3);
+    }
+  }
+  function reportAndCheckReward(domain) {
+    if (API_TOKEN === "__TOKEN__" || !API_TOKEN) return;
+    var token = API_TOKEN;
+    fetch(API_BASE + "/api/complete", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ token, domain })
+    }).then(function() {
+      return fetch(API_BASE + "/api/reward-status?token=" + encodeURIComponent(token));
+    }).then(function(r) {
+      return r.json();
+    }).then(function(data) {
+      if (data && data.unlocked) {
+        showReward();
+        if (REWARD_REDIRECT_URL) {
+          var sep = REWARD_REDIRECT_URL.indexOf("?") >= 0 ? "&" : "?";
+          setTimeout(function() {
+            window.location.replace(REWARD_REDIRECT_URL + sep + "unlocked=1");
+          }, 2e3);
+        }
+      }
+    }).catch(function() {
+    });
   }
   function run() {
     var domain = normalizeDomain(window.location.hostname);
@@ -98,6 +127,7 @@
         window.location.href = cfg.r;
       }, 1500);
       checkReward(state);
+      reportAndCheckReward(domain);
     }
   }
   run();

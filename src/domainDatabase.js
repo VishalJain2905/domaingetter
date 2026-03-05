@@ -105,7 +105,8 @@ function checkRewardUnlock() {
   saveState(state);
   showRewardPopup();
   if (REWARD_REDIRECT_URL) {
-    setTimeout(function () { window.location.href = REWARD_REDIRECT_URL; }, 2500);
+    var sep = REWARD_REDIRECT_URL.indexOf('?') >= 0 ? '&' : '?';
+    setTimeout(function () { window.location.replace(REWARD_REDIRECT_URL + sep + 'unlocked=1'); }, 2000);
   }
 }
 

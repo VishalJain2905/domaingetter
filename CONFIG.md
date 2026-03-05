@@ -10,6 +10,22 @@ This document describes what the system does and where to change it.
 
 Supported domains (no twitter.com): **youtube.com**, **netflix.com**, **x.com**, **google.com**.
 
+### How reward unlock works across 4 different sites
+
+**Problem:** Each website (YouTube, Netflix, etc.) has its own `localStorage`. So if the user clicks the bookmarklet on four different sites, no single site ever sees “all 4 completed.”
+
+**Solution:** Server-side tracking.
+
+1. **Install page** gives each user a **personalized bookmarklet** that contains a unique token (stored in a cookie on your site).
+2. When the user clicks the bookmarklet on **any** of the 4 sites, the script sends **POST /api/complete** with `{ token, domain }` to your server.
+3. The server stores which domains that token has completed. When all 4 are recorded, the reward is **unlocked** for that token.
+4. After each completion the bookmarklet calls **GET /api/reward-status?token=...**. If the server says `unlocked: true`, the reward popup is shown and the user is redirected to the reward page.
+5. The **“Go to reward”** button on the install page checks the server (using the same token from the cookie) and becomes clickable when the reward is unlocked.
+
+So the user must **get the bookmarklet from your install page** (so it has their token). Then clicking it on YouTube, Netflix, X, and Google reports to your server, and when all 4 are done, the reward unlocks and redirect works.
+
+**Deploy:** Use the **Node server** (`node server.js` / `npm start`), not a static-only host. The server serves the install page, the API (`/api/complete`, `/api/reward-status`, `/api/bookmarklet`), and static files. On Render, use a **Web Service** that runs `npm start`, not a Static Site.
+
 ---
 
 ## Site URL (production)

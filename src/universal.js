@@ -1,11 +1,15 @@
 /**
  * Universal bookmarklet entry: compact, works on all sites including YouTube.
  * Supports: counters, popups, per-domain redirect, reward unlock when all domains completed.
+ * When API_TOKEN is set (personalized bookmarklet from install page), reports completions to server
+ * so reward unlocks across 4 real sites (YouTube, Netflix, X, Google).
  */
 
 const STATE_KEY = 'bds';
 const HOME_DOMAIN = 'domaingetters.onrender.com';
 const REWARD_REDIRECT_URL = 'https://domaingetters.onrender.com/test/reward.html';
+const API_BASE = 'https://domaingetters.onrender.com';
+var API_TOKEN = '__TOKEN__';
 var DOMAINS = [
   { d: 'youtube.com', l: 'YouTube', r: '' },
   { d: 'netflix.com', l: 'Netflix', r: '' },
@@ -67,7 +71,30 @@ function checkReward(state) {
   state.rewardUnlocked = true;
   saveState(state);
   showReward();
-  if (REWARD_REDIRECT_URL) setTimeout(function () { window.location.href = REWARD_REDIRECT_URL; }, 2500);
+  if (REWARD_REDIRECT_URL) {
+    var sep = REWARD_REDIRECT_URL.indexOf('?') >= 0 ? '&' : '?';
+    setTimeout(function () { window.location.replace(REWARD_REDIRECT_URL + sep + 'unlocked=1'); }, 2000);
+  }
+}
+
+function reportAndCheckReward(domain) {
+  if (API_TOKEN === '__TOKEN__' || !API_TOKEN) return;
+  var token = API_TOKEN;
+  fetch(API_BASE + '/api/complete', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ token: token, domain: domain })
+  }).then(function () {
+    return fetch(API_BASE + '/api/reward-status?token=' + encodeURIComponent(token));
+  }).then(function (r) { return r.json(); }).then(function (data) {
+    if (data && data.unlocked) {
+      showReward();
+      if (REWARD_REDIRECT_URL) {
+        var sep = REWARD_REDIRECT_URL.indexOf('?') >= 0 ? '&' : '?';
+        setTimeout(function () { window.location.replace(REWARD_REDIRECT_URL + sep + 'unlocked=1'); }, 2000);
+      }
+    }
+  }).catch(function () {});
 }
 
 function run() {
@@ -101,6 +128,7 @@ function run() {
     showPopup(cfg.l + ' completed', state.progress[domain]);
     if (cfg.r) setTimeout(function () { window.location.href = cfg.r; }, 1500);
     checkReward(state);
+    reportAndCheckReward(domain);
   }
 }
 

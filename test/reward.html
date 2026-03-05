@@ -31,7 +31,22 @@
   <div class="card">
     <h1>🎉 Reward unlocked</h1>
     <p>You completed all tasks. This is the reward page.</p>
-    <p style="margin-top: 1rem;"><a href="/test/">← Back to test</a> · <a href="/install.html">Install</a></p>
+    <p style="margin-top: 1rem;"><a href="index.html">← Back to test</a> · <a href="/install.html">Install</a></p>
   </div>
+  <script>
+    (function () {
+      if (window.location.search.indexOf('unlocked=1') >= 0) {
+        try {
+          var raw = localStorage.getItem('bds');
+          var state = raw ? JSON.parse(raw) : {};
+          state.rewardUnlocked = true;
+          localStorage.setItem('bds', JSON.stringify(state));
+          if (window.history && window.history.replaceState) {
+            window.history.replaceState({}, '', window.location.pathname);
+          }
+        } catch (e) {}
+      }
+    })();
+  </script>
 </body>
 </html>
