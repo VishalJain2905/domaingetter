@@ -8,7 +8,8 @@ const HOME_DOMAIN = 'domaingetters.onrender.com';
 const REWARD_REDIRECT_URL = 'https://domaingetters.onrender.com/test/reward.html';
 var DOMAINS = [
   { d: 'youtube.com', l: 'YouTube', r: '' },
-  { d: 'twitter.com', l: 'Twitter', r: '' },
+  { d: 'netflix.com', l: 'Netflix', r: '' },
+  { d: 'x.com', l: 'X', r: '' },
   { d: 'google.com', l: 'Google', r: '' }
 ];
 
@@ -41,7 +42,7 @@ function showPopup(text, count) {
   var el = document.createElement('div');
   el.id = 'bookmarklet-popup';
   el.textContent = count !== undefined ? text + ' (' + count + ')' : text;
-  el.style.cssText = 'position:fixed;top:16px;right:16px;padding:12px 20px;background:#1a1a2e;color:#eee;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.3);z-index:2147483647;font:14px system-ui,sans-serif;max-width:320px';
+  el.style.cssText = 'position:fixed;top:16px;right:16px;padding:12px 20px;background:#1a1a2e;color:#eee;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.3);z-index:2147483647;font:14px system-ui,sans-serif;max-width:320px;white-space:pre-line';
   var old = document.getElementById('bookmarklet-popup');
   if (old) old.remove();
   document.body.appendChild(el);
@@ -74,6 +75,8 @@ function run() {
 
   if (domain === HOME_DOMAIN) {
     saveState({ initialized: true, startTime: Date.now(), progress: {}, completedDomains: [] });
+    var msg = 'Steps for reward:\n1. You\'re here (started!)\n2. Go to YouTube → click bookmarklet\n3. Go to Netflix → click bookmarklet\n4. Go to X → click bookmarklet\n5. Go to Google → click bookmarklet\nComplete all 4 sites to unlock your reward!';
+    showPopup(msg);
     return;
   }
 

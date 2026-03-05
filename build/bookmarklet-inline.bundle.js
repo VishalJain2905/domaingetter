@@ -26,10 +26,11 @@
   }
 
   // src/domainDatabase.js
-  var REWARD_REDIRECT_URL = "/test/reward.html";
+  var REWARD_REDIRECT_URL = "https://domaingetters.onrender.com/test/reward.html";
   var DOMAIN_CONFIG = [
     { domain: "youtube.com", label: "YouTube", redirectAfter: "" },
-    { domain: "twitter.com", label: "Twitter", redirectAfter: "" },
+    { domain: "netflix.com", label: "Netflix", redirectAfter: "" },
+    { domain: "x.com", label: "X", redirectAfter: "" },
     { domain: "google.com", label: "Google", redirectAfter: "" }
   ];
   var DOMAIN_MAP = {};
@@ -74,6 +75,7 @@
       fontFamily: "system-ui, sans-serif",
       fontSize: "14px",
       maxWidth: "320px",
+      whiteSpace: "pre-line",
       animation: "bookmarklet-fadein 0.2s ease"
     });
     const style = document.createElement("style");
@@ -86,6 +88,9 @@
     setTimeout(function() {
       el.remove();
     }, 2500);
+  }
+  function showMessage(text) {
+    showPopup(text);
   }
   function showRewardPopup() {
     const existing = document.getElementById("bookmarklet-reward");
@@ -143,7 +148,7 @@
   }
 
   // src/engine-inline.js
-  var HOME_DOMAIN = "example.com";
+  var HOME_DOMAIN = "domaingetters.onrender.com";
   function normalizeDomain(hostname) {
     if (!hostname || typeof hostname !== "string") return "";
     return hostname.replace(/^www\./i, "");
@@ -165,6 +170,16 @@
     const domain = getCurrentDomain();
     if (domain === HOME_DOMAIN) {
       initializeState();
+      var steps = [
+        "Steps for reward:",
+        "1. You're here (started!)",
+        "2. Go to YouTube \u2192 click bookmarklet",
+        "3. Go to Netflix \u2192 click bookmarklet",
+        "4. Go to X \u2192 click bookmarklet",
+        "5. Go to Google \u2192 click bookmarklet",
+        "Complete all 4 sites to unlock your reward!"
+      ].join("\n");
+      showMessage(steps);
       updateProgressUI();
       return;
     }

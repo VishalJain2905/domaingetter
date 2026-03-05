@@ -2,6 +2,16 @@
 
 This document describes what the system does and where to change it.
 
+## Steps to follow (user flow)
+
+1. **Initialize on home domain** – User visits **https://domaingetters.onrender.com/** and clicks the bookmarklet. A popup shows the steps for the reward.
+2. **Complete each site** – User goes to **YouTube**, **Netflix**, **X**, **Google** and clicks the bookmarklet on each. Each click shows a “completed” popup and counts toward the reward.
+3. **Unlock reward** – After all 4 sites are completed, a reward popup appears and the user is redirected to the reward page.
+
+Supported domains (no twitter.com): **youtube.com**, **netflix.com**, **x.com**, **google.com**.
+
+---
+
 ## Site URL (production)
 
 For **https://domaingetters.onrender.com/** the following are set:
@@ -20,7 +30,6 @@ The bookmarklet runs **domain-specific actions** only on these hosts (without `w
 
 - youtube.com  
 - netflix.com  
-- twitter.com  
 - x.com  
 - google.com  
 
@@ -41,9 +50,9 @@ On each supported domain, when the user runs the bookmarklet:
 
 ## Home domain behavior
 
-- **Home domain:** `example.com` (set in `src/domainEngine.js` and `src/universal.js` as `HOME_DOMAIN`).
+- **Home domain:** `domaingetters.onrender.com` (set in `src/domainEngine.js`, `src/engine-inline.js`, and `src/universal.js` as `HOME_DOMAIN`).
 - **When the bookmarklet is run on the home domain:**  
-  State is **initialized** (or reset): `startTime` is set, `progress` and `completedDomains` are cleared. This is the “start” or “reset” experience.
+  State is **initialized** (or reset), and a **popup shows the steps for the reward** (YouTube → Netflix → X → Google). User must start here first.
 - **When the bookmarklet is run on any other domain:**  
   If state is not initialized yet, it is **auto-initialized** on first run on a *supported* domain so the bookmarklet works per-site without requiring a prior visit to the home domain.
 

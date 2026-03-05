@@ -5,7 +5,7 @@
 const HOME_DOMAIN = 'domaingetters.onrender.com';
 
 import { loadState, saveState, incrementDomain } from './stateManager.js';
-import { domainDatabase } from './domainDatabase.js';
+import { domainDatabase, showMessage, DOMAIN_CONFIG } from './domainDatabase.js';
 import { updateProgressUI } from './ui.js';
 
 /**
@@ -56,6 +56,16 @@ export function run() {
 
   if (domain === HOME_DOMAIN) {
     initializeState();
+    var steps = [
+      'Steps for reward:',
+      '1. You\'re here (started!)',
+      '2. Go to YouTube → click bookmarklet',
+      '3. Go to Netflix → click bookmarklet',
+      '4. Go to X → click bookmarklet',
+      '5. Go to Google → click bookmarklet',
+      'Complete all 4 sites to unlock your reward!'
+    ].join('\n');
+    showMessage(steps);
     updateProgressUI();
     return;
   }

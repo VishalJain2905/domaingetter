@@ -12,7 +12,8 @@ export const REWARD_REDIRECT_URL = 'https://domaingetters.onrender.com/test/rewa
 /** Per-domain: optional redirect URL after running this domain's action. '' = no redirect. */
 const DOMAIN_CONFIG = [
   { domain: 'youtube.com', label: 'YouTube', redirectAfter: '' },
-  { domain: 'twitter.com', label: 'Twitter', redirectAfter: '' },
+  { domain: 'netflix.com', label: 'Netflix', redirectAfter: '' },
+  { domain: 'x.com', label: 'X', redirectAfter: '' },
   { domain: 'google.com', label: 'Google', redirectAfter: '' },
 ];
 
@@ -51,6 +52,7 @@ function showPopup(text, count) {
     background: '#1a1a2e', color: '#eee', borderRadius: '8px',
     boxShadow: '0 4px 12px rgba(0,0,0,0.3)', zIndex: '2147483647',
     fontFamily: 'system-ui, sans-serif', fontSize: '14px', maxWidth: '320px',
+    whiteSpace: 'pre-line',
     animation: 'bookmarklet-fadein 0.2s ease',
   });
   const style = document.createElement('style');
@@ -61,6 +63,11 @@ function showPopup(text, count) {
   }
   document.body.appendChild(el);
   setTimeout(function () { el.remove(); }, 2500);
+}
+
+/** Show a message popup (e.g. home domain "Start your tasks"). Exported for use in engine. */
+export function showMessage(text) {
+  showPopup(text);
 }
 
 function showRewardPopup() {
