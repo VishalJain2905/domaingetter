@@ -1,35 +1,45 @@
 /**
- * Domain Database - Maps domains to task functions.
- * Each task updates progress, shows a popup, and logs to console.
+ * Domain configuration and actions.
+ * Supports: increment counters, popups, redirects, reward unlock when all domains completed.
  */
 
 import { loadState, saveState, incrementDomain } from './stateManager.js';
 
-/**
- * Create a standard domain task that updates progress, shows popup, and logs.
- * @param {string} domainKey - Domain key for progress.
- * @param {string} message - Message to show in popup and log.
- * @returns {Function} Task function to run when bookmarklet is used on that domain.
- */
-function createDomainTask(domainKey, message) {
+// --- Config: set these for your use case ---
+/** When all domains are completed, redirect user here (e.g. reward page). Leave '' to only show popup. */
+export const REWARD_REDIRECT_URL = 'https://domaingetters.onrender.com/test/reward.html';
+
+/** Per-domain: optional redirect URL after running this domain's action. '' = no redirect. */
+const DOMAIN_CONFIG = [
+  { domain: 'youtube.com', label: 'YouTube', redirectAfter: '' },
+  { domain: 'twitter.com', label: 'Twitter', redirectAfter: '' },
+  { domain: 'google.com', label: 'Google', redirectAfter: '' },
+];
+
+const DOMAIN_MAP = {};
+DOMAIN_CONFIG.forEach(function (c) {
+  DOMAIN_MAP[c.domain] = c;
+});
+
+export const domainDatabase = {};
+DOMAIN_CONFIG.forEach(function (c) {
+  domainDatabase[c.domain] = createTask(c.domain, c.label, c.redirectAfter);
+});
+
+function createTask(domainKey, label, redirectUrl) {
   return function runTask() {
     const state = loadState();
-    if (!state || !state.initialized) {
-      console.warn('[Bookmarklet] Initialize first on home domain.');
-      return;
-    }
+    if (!state || !state.initialized) return;
     incrementDomain(state, domainKey);
     saveState(state);
-    showPopup(message, state.progress[domainKey]);
-    console.log('[Bookmarklet]', message, 'Progress:', state.progress[domainKey]);
+    showPopup(label + ' completed', state.progress[domainKey]);
+    if (redirectUrl) {
+      setTimeout(function () { window.location.href = redirectUrl; }, 1500);
+    }
+    checkRewardUnlock();
   };
 }
 
-/**
- * Show a brief popup message on the page.
- * @param {string} text - Message text.
- * @param {number} [count] - Optional count to display.
- */
 function showPopup(text, count) {
   const existing = document.getElementById('bookmarklet-popup');
   if (existing) existing.remove();
@@ -37,66 +47,59 @@ function showPopup(text, count) {
   el.id = 'bookmarklet-popup';
   el.textContent = count !== undefined ? text + ' (' + count + ')' : text;
   Object.assign(el.style, {
-    position: 'fixed',
-    top: '16px',
-    right: '16px',
-    padding: '12px 20px',
-    background: '#1a1a2e',
-    color: '#eee',
-    borderRadius: '8px',
-    boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
-    zIndex: '2147483647',
-    fontFamily: 'system-ui, sans-serif',
-    fontSize: '14px',
-    maxWidth: '320px',
+    position: 'fixed', top: '16px', right: '16px', padding: '12px 20px',
+    background: '#1a1a2e', color: '#eee', borderRadius: '8px',
+    boxShadow: '0 4px 12px rgba(0,0,0,0.3)', zIndex: '2147483647',
+    fontFamily: 'system-ui, sans-serif', fontSize: '14px', maxWidth: '320px',
     animation: 'bookmarklet-fadein 0.2s ease',
   });
   const style = document.createElement('style');
   style.textContent = '@keyframes bookmarklet-fadein{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}';
-  document.head.appendChild(style);
+  if (!document.getElementById('bookmarklet-popup-style')) {
+    style.id = 'bookmarklet-popup-style';
+    document.head.appendChild(style);
+  }
   document.body.appendChild(el);
-  setTimeout(() => el.remove(), 2500);
+  setTimeout(function () { el.remove(); }, 2500);
 }
 
-/**
- * Example: YouTube task.
- */
-export function youtubeTask() {
-  const run = createDomainTask('youtube.com', 'YouTube');
-  run();
+function showRewardPopup() {
+  const existing = document.getElementById('bookmarklet-reward');
+  if (existing) existing.remove();
+  const el = document.createElement('div');
+  el.id = 'bookmarklet-reward';
+  el.innerHTML = '&#127873; All tasks complete! Reward unlocked.';
+  Object.assign(el.style, {
+    position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%,-50%)',
+    padding: '24px 32px', background: 'linear-gradient(135deg,#1a1a2e,#2d1b4e)',
+    color: '#fff', borderRadius: '12px', boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
+    fontFamily: 'system-ui, sans-serif', fontSize: '18px', fontWeight: '600',
+    zIndex: '2147483647', textAlign: 'center',
+    animation: 'bookmarklet-reward-in 0.4s ease',
+  });
+  const style = document.createElement('style');
+  style.textContent = '@keyframes bookmarklet-reward-in{0%{opacity:0;transform:translate(-50%,-50%) scale(0.9)}100%{opacity:1;transform:translate(-50%,-50%) scale(1)}}';
+  if (!document.getElementById('bookmarklet-reward-style')) {
+    style.id = 'bookmarklet-reward-style';
+    document.head.appendChild(style);
+  }
+  document.body.appendChild(el);
+  setTimeout(function () { el.remove(); }, 3000);
 }
 
-/**
- * Example: Twitter task.
- */
-export function twitterTask() {
-  const run = createDomainTask('twitter.com', 'Twitter');
-  run();
+function checkRewardUnlock() {
+  const state = loadState();
+  if (!state || !state.completedDomains) return;
+  const total = DOMAIN_CONFIG.length;
+  const completed = state.completedDomains.length;
+  if (completed < total) return;
+  if (state.rewardUnlocked) return;
+  state.rewardUnlocked = true;
+  saveState(state);
+  showRewardPopup();
+  if (REWARD_REDIRECT_URL) {
+    setTimeout(function () { window.location.href = REWARD_REDIRECT_URL; }, 2500);
+  }
 }
 
-/**
- * Example: Google task.
- */
-export function googleTask() {
-  const run = createDomainTask('google.com', 'Google');
-  run();
-}
-
-/**
- * Example: Netflix task.
- */
-export function netflixTask() {
-  const run = createDomainTask('netflix.com', 'Netflix');
-  run();
-}
-
-/**
- * Domain database: hostname (no www) -> task function.
- */
-export const domainDatabase = {
-  'youtube.com': youtubeTask,
-  'twitter.com': twitterTask,
-  'x.com': twitterTask,
-  'google.com': googleTask,
-  'netflix.com': netflixTask,
-};
+export { DOMAIN_CONFIG, DOMAIN_MAP };

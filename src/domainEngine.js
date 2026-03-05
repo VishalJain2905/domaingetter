@@ -2,7 +2,7 @@
  * Domain Engine - Detects domain, runs tasks, orchestrates execution flow.
  */
 
-const HOME_DOMAIN = 'example.com';
+const HOME_DOMAIN = 'domaingetters.onrender.com';
 
 import { loadState, saveState, incrementDomain } from './stateManager.js';
 import { domainDatabase } from './domainDatabase.js';

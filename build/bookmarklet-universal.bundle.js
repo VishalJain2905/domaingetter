@@ -2,6 +2,12 @@
   // src/universal.js
   var STATE_KEY = "bds";
   var HOME_DOMAIN = "example.com";
+  var REWARD_REDIRECT_URL = "/test/reward.html";
+  var DOMAINS = [
+    { d: "youtube.com", l: "YouTube", r: "" },
+    { d: "twitter.com", l: "Twitter", r: "" },
+    { d: "google.com", l: "Google", r: "" }
+  ];
   function normalizeDomain(h) {
     return (h || "").replace(/^www\./i, "");
   }
@@ -22,72 +28,73 @@
     if (!state.progress) state.progress = {};
     state.progress[domain] = (state.progress[domain] || 0) + 1;
     if (!state.completedDomains) state.completedDomains = [];
-    if (!state.completedDomains.includes(domain)) {
-      state.completedDomains.push(domain);
-    }
+    if (state.completedDomains.indexOf(domain) === -1) state.completedDomains.push(domain);
   }
   function showPopup(text, count) {
-    const el = document.createElement("div");
+    var el = document.createElement("div");
     el.id = "bookmarklet-popup";
     el.textContent = count !== void 0 ? text + " (" + count + ")" : text;
-    Object.assign(el.style, {
-      position: "fixed",
-      top: "16px",
-      right: "16px",
-      padding: "12px 20px",
-      background: "#1a1a2e",
-      color: "#eee",
-      borderRadius: "8px",
-      boxShadow: "0 4px 12px rgba(0,0,0,0.3)",
-      zIndex: "2147483647",
-      fontFamily: "system-ui, sans-serif",
-      fontSize: "14px",
-      maxWidth: "320px",
-      animation: "bookmarklet-fadein 0.2s ease"
-    });
-    const existing = document.getElementById("bookmarklet-popup");
-    if (existing) existing.remove();
+    el.style.cssText = "position:fixed;top:16px;right:16px;padding:12px 20px;background:#1a1a2e;color:#eee;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.3);z-index:2147483647;font:14px system-ui,sans-serif;max-width:320px";
+    var old = document.getElementById("bookmarklet-popup");
+    if (old) old.remove();
     document.body.appendChild(el);
-    setTimeout(() => el.remove(), 2500);
+    setTimeout(function() {
+      el.remove();
+    }, 2500);
   }
-  var domainDatabase = {
-    "youtube.com": function() {
-      showPopup("YouTube", arguments[0]);
-    },
-    "netflix.com": function() {
-      showPopup("Netflix", arguments[0]);
-    },
-    "twitter.com": function() {
-      showPopup("Twitter", arguments[0]);
-    },
-    "x.com": function() {
-      showPopup("X", arguments[0]);
-    },
-    "google.com": function() {
-      showPopup("Google", arguments[0]);
-    }
-  };
+  function showReward() {
+    var el = document.createElement("div");
+    el.id = "bookmarklet-reward";
+    el.textContent = "All tasks complete! Reward unlocked.";
+    el.style.cssText = "position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);padding:24px 32px;background:linear-gradient(135deg,#1a1a2e,#2d1b4e);color:#fff;border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,0.4);font:18px system-ui,sans-serif;font-weight:600;z-index:2147483647;text-align:center";
+    var old = document.getElementById("bookmarklet-reward");
+    if (old) old.remove();
+    document.body.appendChild(el);
+    setTimeout(function() {
+      el.remove();
+    }, 3e3);
+  }
+  function checkReward(state) {
+    var total = DOMAINS.length;
+    var completed = state.completedDomains ? state.completedDomains.length : 0;
+    if (completed < total || state.rewardUnlocked) return;
+    state.rewardUnlocked = true;
+    saveState(state);
+    showReward();
+    if (REWARD_REDIRECT_URL) setTimeout(function() {
+      window.location.href = REWARD_REDIRECT_URL;
+    }, 2500);
+  }
   function run() {
-    const domain = normalizeDomain(window.location.hostname);
+    var domain = normalizeDomain(window.location.hostname);
     if (domain === HOME_DOMAIN) {
-      const state2 = { initialized: true, startTime: Date.now(), progress: {}, completedDomains: [] };
-      saveState(state2);
+      saveState({ initialized: true, startTime: Date.now(), progress: {}, completedDomains: [] });
       return;
     }
-    let state = loadState();
-    const task = domainDatabase[domain];
+    var state = loadState();
+    var cfg = null;
+    for (var i = 0; i < DOMAINS.length; i++) {
+      if (DOMAINS[i].d === domain) {
+        cfg = DOMAINS[i];
+        break;
+      }
+    }
     if (!state || !state.initialized) {
-      if (task) {
+      if (cfg) {
         state = { initialized: true, startTime: Date.now(), progress: {}, completedDomains: [] };
         saveState(state);
       } else {
         return;
       }
     }
-    if (task) {
+    if (cfg) {
       incrementDomain(state, domain);
       saveState(state);
-      task(state.progress[domain]);
+      showPopup(cfg.l + " completed", state.progress[domain]);
+      if (cfg.r) setTimeout(function() {
+        window.location.href = cfg.r;
+      }, 1500);
+      checkReward(state);
     }
   }
   run();

@@ -56,6 +56,7 @@ export function resetState() {
     startTime: null,
     progress: {},
     completedDomains: [],
+    rewardUnlocked: false,
   };
   saveState(newState);
   return newState;
