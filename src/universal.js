@@ -2,7 +2,7 @@
  * Universal bookmarklet entry: compact, works on all sites including YouTube.
  * Supports: counters, popups, per-domain redirect, reward unlock when all domains completed.
  * When API_TOKEN is set (personalized bookmarklet from install page), reports completions to server
- * so reward unlocks across 4 real sites (YouTube, Netflix, X, Google).
+ * so reward unlocks across 3 real sites (YouTube, Netflix, Google).
  */
 
 const STATE_KEY = 'bds';
@@ -13,7 +13,6 @@ var API_TOKEN = '__TOKEN__';
 var DOMAINS = [
   { d: 'youtube.com', l: 'YouTube', r: '' },
   { d: 'netflix.com', l: 'Netflix', r: '' },
-  { d: 'x.com', l: 'X', r: '' },
   { d: 'google.com', l: 'Google', r: '' }
 ];
 
@@ -102,7 +101,7 @@ function run() {
 
   if (domain === HOME_DOMAIN) {
     saveState({ initialized: true, startTime: Date.now(), progress: {}, completedDomains: [] });
-    var msg = 'Steps for reward:\n1. You\'re here (started!)\n2. Go to YouTube → click bookmarklet\n3. Go to Netflix → click bookmarklet\n4. Go to X → click bookmarklet\n5. Go to Google → click bookmarklet\nComplete all 4 sites to unlock your reward!';
+    var msg = 'Steps for reward:\n1. You\'re here (started!)\n2. Go to YouTube → click bookmarklet\n3. Go to Netflix → click bookmarklet\n4. Go to Google → click bookmarklet\nComplete all 3 sites to unlock your reward!';
     showPopup(msg);
     return;
   }

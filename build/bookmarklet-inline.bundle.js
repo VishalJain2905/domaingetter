@@ -30,7 +30,6 @@
   var DOMAIN_CONFIG = [
     { domain: "youtube.com", label: "YouTube", redirectAfter: "" },
     { domain: "netflix.com", label: "Netflix", redirectAfter: "" },
-    { domain: "x.com", label: "X", redirectAfter: "" },
     { domain: "google.com", label: "Google", redirectAfter: "" }
   ];
   var DOMAIN_MAP = {};
@@ -176,9 +175,8 @@
         "1. You're here (started!)",
         "2. Go to YouTube \u2192 click bookmarklet",
         "3. Go to Netflix \u2192 click bookmarklet",
-        "4. Go to X \u2192 click bookmarklet",
-        "5. Go to Google \u2192 click bookmarklet",
-        "Complete all 4 sites to unlock your reward!"
+        "4. Go to Google \u2192 click bookmarklet",
+        "Complete all 3 sites to unlock your reward!"
       ].join("\n");
       showMessage(steps);
       updateProgressUI();

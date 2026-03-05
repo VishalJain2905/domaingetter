@@ -61,9 +61,8 @@ export function run() {
       '1. You\'re here (started!)',
       '2. Go to YouTube → click bookmarklet',
       '3. Go to Netflix → click bookmarklet',
-      '4. Go to X → click bookmarklet',
-      '5. Go to Google → click bookmarklet',
-      'Complete all 4 sites to unlock your reward!'
+      '4. Go to Google → click bookmarklet',
+      'Complete all 3 sites to unlock your reward!'
     ].join('\n');
     showMessage(steps);
     updateProgressUI();

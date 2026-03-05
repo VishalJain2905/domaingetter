@@ -374,7 +374,7 @@
           🎁 Go to reward
         </a>
       </div>
-      <p class="reward-hint" id="rewardHint" style="margin-top: 8px; font-size: 13px; color: rgba(255,255,255,0.6);">Complete all 4 sites with the bookmarklet to unlock the reward button above.</p>
+      <p class="reward-hint" id="rewardHint" style="margin-top: 8px; font-size: 13px; color: rgba(255,255,255,0.6);">Complete all 3 sites with the bookmarklet to unlock the reward button above.</p>
 
       <div class="advanced">
         <p id="inlineStatus">Loading alternatives...</p>
@@ -498,7 +498,7 @@
           btn.classList.remove('unlocked');
           btn.setAttribute('aria-disabled', 'true');
           btn.onclick = function (e) { e.preventDefault(); };
-          hint.textContent = 'Complete all 4 sites to unlock';
+          hint.textContent = 'Complete all 3 sites to unlock';
         }
       }
       updateRewardButton();

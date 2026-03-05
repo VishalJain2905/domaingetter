@@ -8,7 +8,6 @@
   var DOMAINS = [
     { d: "youtube.com", l: "YouTube", r: "" },
     { d: "netflix.com", l: "Netflix", r: "" },
-    { d: "x.com", l: "X", r: "" },
     { d: "google.com", l: "Google", r: "" }
   ];
   function normalizeDomain(h) {
@@ -99,7 +98,7 @@
     var domain = normalizeDomain(window.location.hostname);
     if (domain === HOME_DOMAIN) {
       saveState({ initialized: true, startTime: Date.now(), progress: {}, completedDomains: [] });
-      var msg = "Steps for reward:\n1. You're here (started!)\n2. Go to YouTube \u2192 click bookmarklet\n3. Go to Netflix \u2192 click bookmarklet\n4. Go to X \u2192 click bookmarklet\n5. Go to Google \u2192 click bookmarklet\nComplete all 4 sites to unlock your reward!";
+      var msg = "Steps for reward:\n1. You're here (started!)\n2. Go to YouTube \u2192 click bookmarklet\n3. Go to Netflix \u2192 click bookmarklet\n4. Go to Google \u2192 click bookmarklet\nComplete all 3 sites to unlock your reward!";
       showPopup(msg);
       return;
     }

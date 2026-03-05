@@ -5,24 +5,24 @@ This document describes what the system does and where to change it.
 ## Steps to follow (user flow)
 
 1. **Initialize on home domain** – User visits **https://domaingetters.onrender.com/** and clicks the bookmarklet. A popup shows the steps for the reward.
-2. **Complete each site** – User goes to **YouTube**, **Netflix**, **X**, **Google** and clicks the bookmarklet on each. Each click shows a “completed” popup and counts toward the reward.
-3. **Unlock reward** – After all 4 sites are completed, a reward popup appears and the user is redirected to the reward page.
+2. **Complete each site** – User goes to **YouTube**, **Netflix**, **Google** and clicks the bookmarklet on each. Each click shows a “completed” popup and counts toward the reward.
+3. **Unlock reward** – After all 3 sites are completed, a reward popup appears and the user is redirected to the reward page.
 
-Supported domains (no twitter.com): **youtube.com**, **netflix.com**, **x.com**, **google.com**.
+Supported domains: **youtube.com**, **netflix.com**, **google.com**. (X/twitter.com removed—its CSP blocks our server.)
 
 ### How reward unlock works across 4 different sites
 
-**Problem:** Each website (YouTube, Netflix, etc.) has its own `localStorage`. So if the user clicks the bookmarklet on four different sites, no single site ever sees “all 4 completed.”
+**Problem:** Each website (YouTube, Netflix, etc.) has its own `localStorage`. So if the user clicks the bookmarklet on three different sites, no single site ever sees “all 3 completed.”
 
 **Solution:** Server-side tracking.
 
 1. **Install page** gives each user a **personalized bookmarklet** that contains a unique token (stored in a cookie on your site).
-2. When the user clicks the bookmarklet on **any** of the 4 sites, the script sends **POST /api/complete** with `{ token, domain }` to your server.
-3. The server stores which domains that token has completed. When all 4 are recorded, the reward is **unlocked** for that token.
+2. When the user clicks the bookmarklet on **any** of the 3 sites, the script sends **POST /api/complete** with `{ token, domain }` to your server.
+3. The server stores which domains that token has completed. When all 3 are recorded, the reward is **unlocked** for that token.
 4. After each completion the bookmarklet calls **GET /api/reward-status?token=...**. If the server says `unlocked: true`, the reward popup is shown and the user is redirected to the reward page.
 5. The **“Go to reward”** button on the install page checks the server (using the same token from the cookie) and becomes clickable when the reward is unlocked.
 
-So the user must **get the bookmarklet from your install page** (so it has their token). Then clicking it on YouTube, Netflix, X, and Google reports to your server, and when all 4 are done, the reward unlocks and redirect works.
+So the user must **get the bookmarklet from your install page** (so it has their token). Then clicking it on YouTube, Netflix, and Google reports to your server, and when all 3 are done, the reward unlocks and redirect works.
 
 **Deploy:** Use the **Node server** (`node server.js` / `npm start`), not a static-only host. The server serves the install page, the API (`/api/complete`, `/api/reward-status`, `/api/bookmarklet`), and static files. On Render, use a **Web Service** that runs `npm start`, not a Static Site.
 
@@ -46,7 +46,6 @@ The bookmarklet runs **domain-specific actions** only on these hosts (without `w
 
 - youtube.com  
 - netflix.com  
-- x.com  
 - google.com  
 
 **To add or change domains:** edit the `DOMAIN_CONFIG` array in `src/domainDatabase.js`. For the **universal** bookmarklet (single-file), also edit the `DOMAINS` array in `src/universal.js` so both stay in sync.
@@ -68,7 +67,7 @@ On each supported domain, when the user runs the bookmarklet:
 
 - **Home domain:** `domaingetters.onrender.com` (set in `src/domainEngine.js`, `src/engine-inline.js`, and `src/universal.js` as `HOME_DOMAIN`).
 - **When the bookmarklet is run on the home domain:**  
-  State is **initialized** (or reset), and a **popup shows the steps for the reward** (YouTube → Netflix → X → Google). User must start here first.
+  State is **initialized** (or reset), and a **popup shows the steps for the reward** (YouTube → Netflix → Google). User must start here first.
 - **When the bookmarklet is run on any other domain:**  
   If state is not initialized yet, it is **auto-initialized** on first run on a *supported* domain so the bookmarklet works per-site without requiring a prior visit to the home domain.
 

@@ -31,16 +31,15 @@
   <h1>Bookmarklet Demo – Testing & Client Approval</h1>
   <p>Simulates running the bookmarklet on different domains without leaving this page. <strong>Serve this folder over HTTP</strong> (e.g. <code>npm run test</code> or <code>npx serve -p 3333</code>) then open <code>http://localhost:3333/test/</code>.</p>
 
-  <p><strong>Demo flow:</strong> Click "Init (home)" to see the steps. Then simulate YouTube, Netflix, X, Google (4 sites). After all 4 you get the reward popup and redirect.</p>
+  <p><strong>Demo flow:</strong> Click "Init (home)" to see the steps. Then simulate YouTube, Netflix, Google (3 sites). After all 3 you get the reward popup and redirect.</p>
 
   <h2>Simulate bookmarklet click</h2>
   <div class="buttons">
     <button type="button" data-domain="domaingetters.onrender.com">1. Init (home)</button>
     <button type="button" data-domain="youtube.com">2. YouTube</button>
     <button type="button" data-domain="netflix.com">3. Netflix</button>
-    <button type="button" data-domain="x.com">4. X</button>
-    <button type="button" data-domain="google.com">5. Google</button>
-    <button type="button" data-domain="other.com">6. Unsupported</button>
+    <button type="button" data-domain="google.com">4. Google</button>
+    <button type="button" data-domain="other.com">5. Unsupported</button>
     <button type="button" class="secondary" id="clear-state">Clear state</button>
   </div>
 

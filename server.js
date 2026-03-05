@@ -16,7 +16,7 @@ const ROOT = fs.existsSync(PUBLIC) ? PUBLIC : __dirname;
 const BUILD = path.join(__dirname, 'build');
 const PORT = Number(process.env.PORT) || 3333;
 
-const REQUIRED_DOMAINS = ['youtube.com', 'netflix.com', 'x.com', 'google.com'];
+const REQUIRED_DOMAINS = ['youtube.com', 'netflix.com', 'google.com'];
 
 /** token -> Set of completed domain strings */
 const completions = new Map();

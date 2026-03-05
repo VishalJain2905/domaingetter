@@ -13,7 +13,6 @@ export const REWARD_REDIRECT_URL = 'https://domaingetters.onrender.com/test/rewa
 const DOMAIN_CONFIG = [
   { domain: 'youtube.com', label: 'YouTube', redirectAfter: '' },
   { domain: 'netflix.com', label: 'Netflix', redirectAfter: '' },
-  { domain: 'x.com', label: 'X', redirectAfter: '' },
   { domain: 'google.com', label: 'Google', redirectAfter: '' },
 ];
 
