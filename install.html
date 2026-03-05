@@ -7,65 +7,76 @@
   <style>
     body { font-family: system-ui, sans-serif; max-width: 520px; margin: 2rem auto; padding: 0 1rem; }
     h1 { font-size: 1.25rem; }
+    h2 { font-size: 0.95rem; }
     p { color: #444; line-height: 1.5; }
-    .link-box { margin: 1.5rem 0; padding: 1rem; background: #f0f0f0; border-radius: 8px; }
-    .link-box a { font-size: 14px; color: #4361ee; text-decoration: none; }
+    .link-box { margin: 1rem 0; padding: 1rem; background: #f0f0f0; border-radius: 8px; }
+    .link-box a { font-size: 14px; color: #4361ee; text-decoration: none; font-weight: 600; }
     .link-box a:hover { text-decoration: underline; }
     .step { margin: 0.75rem 0; padding-left: 1rem; border-left: 3px solid #4361ee; }
-    .error { color: #c00; }
+    hr { margin: 2rem 0; border: none; border-top: 1px solid #ddd; }
+    .advanced { font-size: 0.85rem; color: #666; }
   </style>
 </head>
 <body>
-  <h1>Install domain bookmarklet</h1>
-  <p>Use the link below. Do <strong>not</strong> copy from another project—this page loads the correct code from this repo.</p>
+  <h1>Install Domain Bookmarklet</h1>
+  <p><strong style="color: #2c3e50;">✅ Use the UNIVERSAL bookmarklet below on all sites.</strong> It automatically detects the domain and runs the right action.</p>
 
-  <div class="link-box" id="box">
-    <p id="status">Loading bookmarklet…</p>
-    <p id="link-wrap" style="display:none;"><strong>Drag this to your bookmarks bar:</strong><br><a href="#" id="bookmarklet-link">Domain Bookmarklet</a></p>
-    <p id="err" class="error" style="display:none;"></p>
-  </div>
-
-  <div class="step"><strong>Chrome/Edge:</strong> Drag the link above onto your bookmarks bar. Or right‑click it → “Add to bookmarks”.</div>
-  <div class="step"><strong>Firefox:</strong> Right‑click the link → “Bookmark Link…”.</div>
-  <div class="step">Then open YouTube, Google, etc., and click the bookmark. You should see a popup and a progress widget.</div>
-
-  <p style="margin-top:2rem;"><strong>If you get “Unexpected identifier $” on YouTube/Google:</strong> Chrome truncates long bookmark URLs. Use the loader instead (it fetches the script from this server):</p>
   <div class="link-box">
-    <p id="loader-status">Loading loader…</p>
-    <p id="loader-wrap" style="display:none;"><strong>Drag this to your bookmarks bar:</strong><br><a href="#" id="loader-link">Domain Bookmarklet (loader)</a></p>
+    <p id="universal-status">Loading universal...</p>
+    <p id="universal-wrap" style="display:none;">
+      <strong>Drag to your bookmarks bar:</strong><br>
+      <a href="#" id="universal-link">Domain Bookmarklet (Universal - use this)</a>
+    </p>
   </div>
 
-  <p style="margin-top:2rem;"><strong>YouTube / TrustedScriptURL:</strong> Use the inline bookmarklet (no widget, works on YouTube):</p>
+  <div class="step"><strong>Chrome/Edge:</strong> Drag the link above to your bookmarks bar.</div>
+  <div class="step"><strong>Firefox:</strong> Right‑click the link → "Bookmark Link…".</div>
+  <div class="step">Then click the bookmark on YouTube, Netflix, Google, Twitter, etc. You should see a popup.</div>
+
+  <hr>
+
+  <h2>Advanced (if needed):</h2>
+  
+  <p class="advanced"><strong>If you get errors on YouTube:</strong> Use the inline version instead:</p>
   <div class="link-box">
     <p id="inline-status">Loading...</p>
-    <p id="inline-wrap" style="display:none;"><strong>Drag to bookmarks:</strong> <a href="#" id="inline-link">Inline (for YouTube)</a></p>
+    <p id="inline-wrap" style="display:none;"><strong>Drag:</strong> <a href="#" id="inline-link">Inline (YouTube)</a></p>
+  </div>
+
+  <p class="advanced"><strong>If bookmark URL is truncated in Chrome:</strong> Use the loader:</p>
+  <div class="link-box">
+    <p id="loader-status">Loading...</p>
+    <p id="loader-wrap" style="display:none;"><strong>Drag:</strong> <a href="#" id="loader-link">Loader (fallback)</a></p>
   </div>
 
   <script>
     (function () {
-      var status = document.getElementById('status');
-      var linkWrap = document.getElementById('link-wrap');
-      var errEl = document.getElementById('err');
-      var a = document.getElementById('bookmarklet-link');
+      var universalStatus = document.getElementById('universal-status');
+      var universalWrap = document.getElementById('universal-wrap');
+      var universalLink = document.getElementById('universal-link');
 
-      fetch('build/bookmarklet.js')
+      fetch('build/bookmarklet-universal.js')
         .then(function (r) { return r.text(); })
         .then(function (code) {
           code = code.trim();
-          if (!code.startsWith('javascript:')) {
-            errEl.textContent = 'Unexpected format in build/bookmarklet.js';
-            errEl.style.display = 'block';
-            return;
+          if (code.startsWith('javascript:')) {
+            universalLink.href = code;
+            universalStatus.textContent = 'Ready. Use this everywhere:';
+            universalWrap.style.display = 'block';
+          } else {
+            universalStatus.textContent = 'Run: npm run build';
           }
-          a.href = code;
-          status.textContent = 'Ready. Drag the link below to your bookmarks bar:';
-          linkWrap.style.display = 'block';
         })
-        .catch(function (e) {
-          status.style.display = 'none';
-          errEl.textContent = 'Could not load build/bookmarklet.js. Run "npm run build" and serve this folder (e.g. npm run test), then open this page again.';
-          errEl.style.display = 'block';
-        });
+        .catch(function () { universalStatus.textContent = 'Not available'; });
+
+      var inlineStatus = document.getElementById('inline-status');
+      var inlineWrap = document.getElementById('inline-wrap');
+      var inlineLink = document.getElementById('inline-link');
+      fetch('build/bookmarklet-inline.js').then(function(r){return r.text();}).then(function(code){
+        code=code.trim();
+        if(code.startsWith('javascript:')){ inlineLink.href=code; inlineStatus.textContent='Ready (YouTube).'; inlineWrap.style.display='block'; }
+        else { inlineStatus.textContent='Not available.'; }
+      }).catch(function(){ inlineStatus.textContent='Not available.'; });
 
       var loaderStatus = document.getElementById('loader-status');
       var loaderWrap = document.getElementById('loader-wrap');
@@ -76,19 +87,10 @@
           var base = location.origin;
           code = code.trim().replace('__BASE_URL__', base);
           loaderLink.href = code;
-          loaderStatus.textContent = 'Loader ready.';
+          loaderStatus.textContent = 'Ready (fallback).';
           loaderWrap.style.display = 'block';
         })
-        .catch(function () { loaderStatus.textContent = 'Loader not available.'; });
-
-      var inlineStatus = document.getElementById('inline-status');
-      var inlineWrap = document.getElementById('inline-wrap');
-      var inlineLink = document.getElementById('inline-link');
-      fetch('build/bookmarklet-inline.js').then(function(r){return r.text();}).then(function(code){
-        code=code.trim();
-        if(code.startsWith('javascript:')){ inlineLink.href=code; inlineStatus.textContent='Ready (use on YouTube).'; inlineWrap.style.display='block'; }
-        else { inlineStatus.textContent='Run npm run build.'; }
-      }).catch(function(){ inlineStatus.textContent='Not available.'; });
+        .catch(function () { loaderStatus.textContent = 'Not available.'; });
     })();
   </script>
 </body>
