@@ -80,11 +80,16 @@
     const run2 = createDomainTask("google.com", "Google");
     run2();
   }
+  function netflixTask() {
+    const run2 = createDomainTask("netflix.com", "Netflix");
+    run2();
+  }
   var domainDatabase = {
     "youtube.com": youtubeTask,
     "twitter.com": twitterTask,
     "x.com": twitterTask,
-    "google.com": googleTask
+    "google.com": googleTask,
+    "netflix.com": netflixTask
   };
 
   // src/timer.js

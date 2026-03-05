@@ -8,18 +8,18 @@ Deploying gives you an **HTTPS URL** for the loader and `bookmarklet-core.js`, s
 
 1. **Push the repo** to GitHub/GitLab/Bitbucket if you haven’t already.
 
-2. **Create a Static Site on Render**
-   - Go to [dashboard.render.com](https://dashboard.render.com) → **New** → **Static Site**
+2. **Create a Web Service on Render (not Static Site – Static Site does not send CORS, so Netflix will block the loader)**
+   - Go to [dashboard.render.com](https://dashboard.render.com) → **New** → **Web Service**
    - Connect your repo and pick the branch to deploy from.
 
 3. **Configure the build**
    - **Name:** e.g. `bookmarklet-system`
    - **Build command:** `npm install && npm run build:static`
-   - **Publish directory:** `public`
+   - **Start command:** `npm start`
 
 4. **Deploy**
-   - Click **Create Static Site**. Render will run the build and publish the `public` folder.
-   - After deploy you’ll get a URL like `https://bookmarklet-system.onrender.com`.
+   - Click **Create Web Service**. Render builds, then starts the server (sends CORS so loader works on Netflix).
+   - You get a URL like `https://bookmarklet-system.onrender.com`.
 
 5. **Use the bookmarklet**
    - Open **https://your-app-name.onrender.com/install.html**

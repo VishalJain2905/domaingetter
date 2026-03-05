@@ -83,6 +83,14 @@ export function googleTask() {
 }
 
 /**
+ * Example: Netflix task.
+ */
+export function netflixTask() {
+  const run = createDomainTask('netflix.com', 'Netflix');
+  run();
+}
+
+/**
  * Domain database: hostname (no www) -> task function.
  */
 export const domainDatabase = {
@@ -90,4 +98,5 @@ export const domainDatabase = {
   'twitter.com': twitterTask,
   'x.com': twitterTask,
   'google.com': googleTask,
+  'netflix.com': netflixTask,
 };

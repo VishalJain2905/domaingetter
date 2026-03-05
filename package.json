@@ -7,7 +7,8 @@
     "build": "node build.js",
     "prebuild": "mkdir -p build",
     "test": "npm run build && node server.js",
-    "build:static": "npm run build && node scripts/prepare-static.js"
+    "build:static": "npm run build && node scripts/prepare-static.js",
+    "start": "node server.js"
   },
   "devDependencies": {
     "esbuild": "^0.24.0",

@@ -56,7 +56,7 @@ async function build() {
   writeFileSync(join(buildDir, 'bookmarklet-core.js'), result.code, 'utf8');
 
   const loaderUrl = process.env.BOOKMARKLET_BASE_URL || '__BASE_URL__';
-  const loaderCode = `javascript:(function(){var u="${loaderUrl.replace(/\/$/, '')}/build/bookmarklet-core.js";fetch(u).then(function(r){if(!r.ok)throw new Error("Load failed "+r.status);return r.text();}).then(function(c){if(!c||c.length<500)throw new Error("Invalid script");var s=document.createElement("script");s.textContent=c;document.body.appendChild(s);}).catch(function(e){console.error("Bookmarklet load failed",e);});})();`;
+  const loaderCode = `javascript:(function(){var u="${loaderUrl.replace(/\/$/, '')}/build/bookmarklet-core.js";fetch(u).then(function(r){if(!r.ok)throw new Error("Load failed "+r.status);return r.text();}).then(function(c){if(!c||c.length<500)throw new Error("Invalid script");var b=new Blob([c],{type:"application/javascript"});var url=URL.createObjectURL(b);var s=document.createElement("script");s.src=url;s.onload=function(){URL.revokeObjectURL(url);};document.body.appendChild(s);}).catch(function(e){console.error("Bookmarklet load failed",e);});})();`;
   writeFileSync(join(buildDir, 'bookmarklet-loader.js'), loaderCode, 'utf8');
 
   console.log('Written:', outFile);

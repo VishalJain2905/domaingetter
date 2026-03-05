@@ -12,7 +12,9 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const PORT = 3333;
+const PUBLIC = path.join(__dirname, 'public');
+const ROOT = fs.existsSync(PUBLIC) ? PUBLIC : __dirname;
+const PORT = Number(process.env.PORT) || 3333;
 
 const MIME = {
   '.html': 'text/html',
@@ -24,9 +26,9 @@ const MIME = {
 
 const server = http.createServer((req, res) => {
   let p = req.url === '/' ? '/install.html' : req.url.split('?')[0];
-  const file = path.join(__dirname, p.replace(/^\//, ''));
+  const file = path.join(ROOT, p.replace(/^\//, ''));
 
-  if (!path.resolve(file).startsWith(path.resolve(__dirname))) {
+  if (!path.resolve(file).startsWith(path.resolve(ROOT))) {
     res.writeHead(403);
     res.end();
     return;
@@ -47,7 +49,6 @@ const server = http.createServer((req, res) => {
 });
 
 server.listen(PORT, () => {
-  console.log('Server with CORS at http://localhost:' + PORT);
-  console.log('Open http://localhost:' + PORT + '/install.html and use the loader bookmarklet.');
-  console.log('On HTTPS sites (e.g. Netflix) use an HTTPS URL for the core (e.g. ngrok or deploy).');
+  console.log('Server with CORS at port', PORT);
+  if (!process.env.PORT) console.log('Open http://localhost:' + PORT + '/install.html');
 });

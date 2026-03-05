@@ -51,7 +51,7 @@ User clicks bookmarklet
 
 ## Deploy (Render, Vercel, Netlify)
 
-Deploy to get an **HTTPS URL** so the loader works on Netflix and other strict sites. See **[DEPLOY.md](DEPLOY.md)** for step-by-step instructions. Summary for **Render**: connect repo → Static Site → Build command `npm install && npm run build:static` → Publish directory `public` → open `https://your-app.onrender.com/install.html` and use the loader bookmark.
+Deploy to get an **HTTPS URL** so the loader works on Netflix and other strict sites. See **[DEPLOY.md](DEPLOY.md)** for step-by-step instructions. On **Render**, use a **Web Service** (not Static Site) so the server sends CORS: Build `npm install && npm run build:static`, Start `npm start`, then open `https://your-app.onrender.com/install.html` and use the loader bookmark.
 
 ## Home Domain
 
@@ -116,6 +116,8 @@ If the **loader** bookmarklet shows **CORS** or **"Failed to fetch"** on a site 
    - **Option B:** Use a tunnel (e.g. [ngrok](https://ngrok.com)): `ngrok http 3333`, then set `BOOKMARKLET_BASE_URL` to the `https://` URL ngrok gives you, rebuild, and use the loader so it fetches the core from that HTTPS URL.
 
 The **"Unexpected end of input"** errors happen when the fetch fails (e.g. CORS/CSP) and the loader tried to run empty or non-JS content; the loader now checks the response and length before running the script.
+
+**YouTube / "TrustedScript" error:** YouTube uses **Trusted Types**, which blocks setting `script.textContent` to a string. The loader was updated to inject the script via a **Blob URL** (`script.src = URL.createObjectURL(blob)`) instead, which may work on YouTube. Rebuild and redeploy, then try the loader again. If it still fails, that site may block all dynamic script injection; use the full bookmarklet in Firefox (higher URL limit) or on sites that don’t enforce Trusted Types.
 
 ## Project Structure
 
